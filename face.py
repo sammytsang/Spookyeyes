@@ -6,7 +6,7 @@ import time
 import signal
 import sys
 
-# Handle Ctrl+C for graceful shutdown
+
 def signal_handler(sig, frame):
     print("Exiting...")
     cap.release()
@@ -16,34 +16,34 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-# Initialize video capture
+
 cap = cv2.VideoCapture(0)
 
-# Load DNN face detector
+
 model_file = "/Users/coding/blendertracking/models/deploy.prototxt"
 weights_file = "/Users/coding/blendertracking/models/res10_300x300_ssd_iter_140000_fp16.caffemodel"
 face_net = cv2.dnn.readNetFromCaffe(model_file, weights_file)
 
-# Define a minimum size for face detection
+
 MIN_FACE_WIDTH = 80
 MIN_FACE_HEIGHT = 80
 
-# Initialize variables for smoothing
+
 smoothed_x, smoothed_y = None, None
-alpha = 0.5  # Smoothing factor (0 < alpha <= 1)
+alpha = 0.5  
 
-# Movement threshold to ignore small changes
-movement_threshold = 5  # Adjust based on jitter level
 
-# FPS variables
+movement_threshold = 5  
+
+
 prev_frame_time = 0
 new_frame_time = 0
 
-# Attempt to connect to Blender socket
+
 while True:
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(('localhost', 12349))  # Match Blender port
+        client_socket.connect(('localhost', 12349))  
         print("Connected to Blender")
         break
     except ConnectionRefusedError:
@@ -55,14 +55,14 @@ while True:
     if not ret:
         break
 
-    # Flip the frame horizontally to mirror the camera
+    
     frame = cv2.flip(frame, 1)
 
-    # Convert frame to blob for DNN
+    
     (h, w) = frame.shape[:2]
     blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300), (104.0, 177.0, 123.0))
 
-    # Detect faces
+   
     face_net.setInput(blob)
     detections = face_net.forward()
 
@@ -119,24 +119,24 @@ while True:
         except Exception as e:
             print(f"Error sending data: {e}")
 
-    # --- FPS Calculation and Display ---
+    
     new_frame_time = time.time()
     fps = 1 / (new_frame_time - prev_frame_time + 1e-8)
     prev_frame_time = new_frame_time
-    print(f"FPS: {fps:.2f}")  # Print to terminal for logging or graphing
+    print(f"FPS: {fps:.2f}")  
     cv2.putText(frame, f'FPS: {int(fps)}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
             0.8, (0, 255, 0), 2, cv2.LINE_AA)
 # -----------------------------------
 
     # -----------------------------------
 
-    # Show the mirrored frame
+    
     cv2.imshow('Face Tracking (Mirrored)', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-# Cleanup
+
 cap.release()
 cv2.destroyAllWindows()
 client_socket.close()
