@@ -64,10 +64,7 @@ Spookyeyes/
 - CPU usage: ~70% (Blender and Python processes combined)
 - Optimised for real-time performance on mid-range laptops
 
-## 📸 Example
 
-![Preview](docs/screenshot.png)  
-*A stylised character with eyes responding to user head movements in real time.*
 
 ## 🧠 Credits
 
